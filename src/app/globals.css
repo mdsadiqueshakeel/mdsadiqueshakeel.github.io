@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 33% 98%;
+  --foreground: 222 47% 8%;
+  --card: 0 0% 100%;
+  --muted: 214 28% 92%;
+  --muted-foreground: 220 12% 38%;
+  --border: 216 24% 84%;
+  --accent: 188 84% 45%;
+  --accent-foreground: 222 47% 8%;
+  --ring: 188 84% 45%;
+}
+
+.dark {
+  --background: 225 39% 6%;
+  --foreground: 210 40% 98%;
+  --card: 222 36% 10%;
+  --muted: 222 28% 15%;
+  --muted-foreground: 218 16% 72%;
+  --border: 220 24% 22%;
+  --accent: 188 84% 52%;
+  --accent-foreground: 222 47% 8%;
+  --ring: 188 84% 52%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(45, 212, 191, 0.14), transparent 28%),
+    radial-gradient(circle at 86% 8%, rgba(251, 191, 36, 0.12), transparent 26%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)));
+  color: hsl(var(--foreground));
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+::selection {
+  background: rgba(103, 232, 249, 0.35);
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+}
+
+.glass {
+  border: 1px solid hsl(var(--border) / 0.72);
+  background: hsl(var(--card) / 0.58);
+  backdrop-filter: blur(18px);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
