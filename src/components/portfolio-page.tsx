@@ -1,24 +1,29 @@
-"use client";
+﻿"use client";
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import type React from "react";
+import { useState } from "react";
 import {
   ArrowDown,
   ArrowUpRight,
+  Check,
   CheckCircle2,
+  Code2,
   Download,
   Github,
   Linkedin,
   Mail,
   MapPin,
-  Phone,
   Rocket,
+  Send,
   Server,
+  ShieldCheck,
   Sparkles,
   TerminalSquare
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { LeetCodeAnalytics } from "@/components/leetcode-analytics";
 import { MotionDiv, ParallaxPanel, Reveal } from "@/components/motion";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +36,7 @@ const HeroOrbit = dynamic(() => import("@/components/hero-orbit").then((mod) => 
   loading: () => <div className="absolute inset-0 animate-pulse bg-cyan-400/5" />
 });
 
-const navItems = ["About", "Experience", "Projects", "Systems", "Skills", "Contact"];
+const navItems = ["About", "Experience", "Projects", "Systems", "Code", "Contact"];
 
 export function PortfolioPage() {
   return (
@@ -42,6 +47,7 @@ export function PortfolioPage() {
       <ExperienceSection />
       <ProjectsSection />
       <SystemsSection />
+      <CodingSection />
       <SkillsSection />
       <AchievementsSection />
       <ContactSection />
@@ -84,10 +90,29 @@ function Header() {
 
 function HeroSection() {
   return (
-    <section id="top" className="relative min-h-[96vh] px-4 pb-16 pt-28 sm:px-6 lg:px-8">
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-        <Reveal>
-          <div className="space-y-8">
+    <section id="top" className="relative min-h-[96vh] overflow-hidden px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_86%_74%,rgba(251,191,36,0.1),transparent_28%)]" />
+      <HeroOrbit />
+      <div className="pointer-events-none absolute right-4 top-28 hidden w-[min(520px,42vw)] rounded-lg border border-border/70 bg-card/35 p-4 shadow-soft-black backdrop-blur-xl lg:block">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>distributed-runtime.map</span>
+          <span className="text-emerald-500">healthy</span>
+        </div>
+        <div className="mt-4 grid gap-3">
+          {["API Gateway", "Spring Services", "AI Inference", "Redis + Data Stores"].map((item, index) => (
+            <div key={item} className="flex items-center gap-3 rounded-md border border-border/70 bg-background/35 px-3 py-2">
+              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-cyan-400/15 font-mono text-xs text-cyan-600 dark:text-cyan-200">
+                {index + 1}
+              </span>
+              <span className="text-sm">{item}</span>
+              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.8)]" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 lg:min-h-[calc(96vh-9rem)] lg:grid-cols-[1.02fr_0.98fr]">
+        <Reveal className="relative z-10">
+          <div className="max-w-3xl space-y-8">
             <Badge className="border-cyan-300/35 bg-cyan-300/10 text-cyan-700 dark:text-cyan-200">
               <Sparkles className="mr-2 h-3.5 w-3.5" />
               Backend systems, AI microservices, cloud delivery
@@ -130,13 +155,17 @@ function HeroSection() {
             </div>
           </div>
         </Reveal>
-        <ParallaxPanel className="relative min-h-[430px] overflow-hidden rounded-lg border border-border bg-slate-950 shadow-soft-black">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.28),transparent_38%),linear-gradient(145deg,rgba(15,23,42,0.2),rgba(2,6,23,0.98))]" />
-          <HeroOrbit />
-          <div className="absolute bottom-4 left-4 right-4 grid gap-3 sm:grid-cols-3">
-            {["JWT/RBAC", "Redis cache", "AWS EC2"].map((item) => (
-              <div key={item} className="rounded-md border border-white/10 bg-white/[0.08] px-3 py-2 text-xs text-white/80 backdrop-blur">
-                {item}
+        <ParallaxPanel className="relative z-10 min-h-[380px] lg:min-h-[520px]">
+          <div className="absolute bottom-4 left-0 right-0 grid gap-3 sm:grid-cols-3 lg:bottom-12 lg:left-10 lg:right-10">
+            {[
+              ["Auth", "JWT/RBAC"],
+              ["Latency", "Redis cache"],
+              ["Delivery", "AWS EC2"]
+            ].map(([label, value]) => (
+              <div key={value} className="glass rounded-lg p-4 shadow-soft-black">
+                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
+                <div className="mt-2 text-sm font-semibold">{value}</div>
+                <div className="flow-line mt-3 h-px rounded-full" />
               </div>
             ))}
           </div>
@@ -236,14 +265,15 @@ function ExperienceSection() {
 
 function ProjectsSection() {
   return (
-    <Section id="projects" eyebrow="Featured projects" title="Product-style showcases for systems that actually shipped.">
-      <div className="space-y-8">
+    <Section id="projects" eyebrow="Featured projects" title="Cinematic case studies for systems that actually shipped.">
+      <div className="space-y-10">
         {projects.map((project, index) => (
           <Reveal key={project.name} delay={index * 0.08}>
-            <article className="glass overflow-hidden rounded-lg">
+            <article className="glass depth-card overflow-hidden rounded-lg">
               <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className={cn("relative min-h-[320px] bg-gradient-to-br p-6 text-white", project.accent)}>
-                  <div className="absolute inset-0 bg-slate-950/20" />
+                  <div className="absolute inset-0 bg-slate-950/30" />
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.13)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.13)_1px,transparent_1px)] bg-[size:38px_38px] opacity-30" />
                   <div className="relative flex h-full flex-col justify-between">
                     <div>
                       <Badge className="border-white/20 bg-white/15 text-white">{project.label}</Badge>
@@ -253,19 +283,30 @@ function ProjectsSection() {
                       {project.architecture.map((node, nodeIndex) => (
                         <MotionDiv
                           key={node}
-                          className="flex items-center gap-3 rounded-md border border-white/20 bg-white/[0.14] px-4 py-3 backdrop-blur"
-                          whileHover={{ x: 8 }}
+                          className="relative flex items-center gap-3 rounded-md border border-white/20 bg-white/[0.14] px-4 py-3 backdrop-blur"
+                          whileHover={{ x: 8, scale: 1.015 }}
                         >
                           <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white/20 font-mono text-xs">
                             {String(nodeIndex + 1).padStart(2, "0")}
                           </span>
                           <span className="text-sm font-medium">{node}</span>
+                          {nodeIndex < project.architecture.length - 1 ? (
+                            <span className="flow-line absolute -bottom-2 left-12 right-8 h-px" />
+                          ) : null}
                         </MotionDiv>
                       ))}
                     </div>
                   </div>
                 </div>
                 <div className="p-6 sm:p-8">
+                  <div className="mb-6 grid gap-3 sm:grid-cols-3">
+                    {["Design", "Deploy", "Monitor"].map((phase) => (
+                      <div key={phase} className="rounded-lg border border-border bg-background/45 p-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{phase}</div>
+                        <div className="flow-line mt-3 h-px" />
+                      </div>
+                    ))}
+                  </div>
                   <p className="text-lg leading-8 text-muted-foreground">{project.description}</p>
                   <div className="mt-6 flex flex-wrap gap-2">
                     {project.stack.map((tech) => (
@@ -354,6 +395,14 @@ function SystemsSection() {
   );
 }
 
+function CodingSection() {
+  return (
+    <Section id="code" eyebrow="Coding consistency" title="Live LeetCode analytics that show discipline over time.">
+      <LeetCodeAnalytics />
+    </Section>
+  );
+}
+
 function SkillsSection() {
   return (
     <Section id="skills" eyebrow="Tech stack" title="A practical stack for backend depth and full-stack delivery.">
@@ -409,17 +458,38 @@ function AchievementsSection() {
 }
 
 function ContactSection() {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const submitContact = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      setStatus("error");
+      return;
+    }
+
+    const subject = encodeURIComponent(`Portfolio inquiry from ${form.name}`);
+    const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`);
+    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
+    setStatus("success");
+  };
+
   return (
     <section id="contact" className="px-4 py-24 sm:px-6 lg:px-8">
       <Reveal>
-        <div className="mx-auto max-w-5xl overflow-hidden rounded-lg border border-border bg-foreground text-background shadow-soft-black">
-          <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="glass depth-card mx-auto max-w-6xl overflow-hidden rounded-lg shadow-soft-black">
+          <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="p-7 sm:p-10">
-              <Badge className="border-background/20 bg-background/10 text-background">Open to strong engineering roles</Badge>
-              <h2 className="mt-5 text-3xl font-semibold sm:text-5xl">Let’s build systems that survive real traffic.</h2>
-              <p className="mt-5 max-w-2xl text-background/72">
+              <Badge className="border-cyan-300/30 bg-cyan-300/10 text-cyan-700 dark:text-cyan-200">Open to strong engineering roles</Badge>
+              <h2 className="mt-5 text-3xl font-semibold sm:text-5xl">Let&apos;s build systems that survive real traffic.</h2>
+              <p className="mt-5 max-w-2xl text-muted-foreground">
                 Available for backend, full-stack, DevOps, and AI integration opportunities where shipping production-quality software matters.
               </p>
+              <div className="mt-8 grid gap-4 text-sm">
+                <ContactRow icon={Mail} label="Email" value={profile.email} href={`mailto:${profile.email}`} />
+                <ContactRow icon={MapPin} label="Location" value={profile.location} />
+                <ContactRow icon={Github} label="GitHub" value="github.com/mdsadiqueshakeel" href={links.github} />
+              </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild variant="glow">
                   <a href={`mailto:${profile.email}`}>
@@ -427,26 +497,75 @@ function ContactSection() {
                     Email
                   </a>
                 </Button>
-                <Button asChild variant="secondary" className="border-background/20 bg-background/10 text-background hover:bg-background/20">
+                <Button asChild variant="secondary">
                   <a href={links.linkedin} target="_blank" rel="noreferrer">
                     <Linkedin className="h-4 w-4" />
                     LinkedIn
                   </a>
                 </Button>
-                <Button asChild variant="secondary" className="border-background/20 bg-background/10 text-background hover:bg-background/20">
+                <Button asChild variant="secondary">
                   <a href={links.leetcode} target="_blank" rel="noreferrer">
+                    <Code2 className="h-4 w-4" />
                     LeetCode
                   </a>
                 </Button>
               </div>
             </div>
-            <div className="border-t border-background/15 p-7 sm:p-10 lg:border-l lg:border-t-0">
-              <div className="grid gap-4 text-sm">
-                <ContactRow icon={Mail} label="Email" value={profile.email} href={`mailto:${profile.email}`} />
-                <ContactRow icon={Phone} label="Phone" value={profile.phone} href={`tel:${profile.phone.replaceAll(" ", "")}`} />
-                <ContactRow icon={MapPin} label="Location" value={profile.location} />
-                <ContactRow icon={Github} label="GitHub" value="github.com/mdsadiqueshakeel" href={links.github} />
-              </div>
+            <div className="border-t border-border p-7 sm:p-10 lg:border-l lg:border-t-0">
+              <form onSubmit={submitContact} className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-2 text-sm">
+                    <span className="text-muted-foreground">Name</span>
+                    <input
+                      value={form.name}
+                      onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                      className="h-12 rounded-md border border-border bg-background/55 px-4 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="Your name"
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm">
+                    <span className="text-muted-foreground">Email</span>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
+                      className="h-12 rounded-md border border-border bg-background/55 px-4 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      placeholder="you@company.com"
+                    />
+                  </label>
+                </div>
+                <label className="grid gap-2 text-sm">
+                  <span className="text-muted-foreground">Message</span>
+                  <textarea
+                    value={form.message}
+                    onChange={(event) => setForm((current) => ({ ...current, message: event.target.value }))}
+                    className="min-h-36 resize-none rounded-md border border-border bg-background/55 px-4 py-3 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                    placeholder="Tell me about the role, project, or system you want to build."
+                  />
+                </label>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <Button type="submit" variant="glow">
+                    <Send className="h-4 w-4" />
+                    Send message
+                  </Button>
+                  <MotionDiv
+                    animate={{ opacity: status === "idle" ? 0.7 : 1, y: status === "idle" ? 0 : -2 }}
+                    className={cn(
+                      "flex items-center gap-2 text-sm",
+                      status === "success" && "text-emerald-500",
+                      status === "error" && "text-rose-500",
+                      status === "idle" && "text-muted-foreground"
+                    )}
+                  >
+                    {status === "success" ? <Check className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+                    {status === "success"
+                      ? "Email draft opened."
+                      : status === "error"
+                        ? "Please fill all fields."
+                        : "Privacy-friendly contact."}
+                  </MotionDiv>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -473,10 +592,10 @@ function ContactRow({
   href?: string;
 }) {
   const content = (
-    <div className="flex items-center gap-3 rounded-lg border border-background/15 bg-background/[0.08] p-4">
+    <div className="flex items-center gap-3 rounded-lg border border-border bg-background/45 p-4">
       <Icon className="h-4 w-4 shrink-0" />
       <div>
-        <div className="text-xs uppercase tracking-[0.2em] text-background/50">{label}</div>
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
         <div className="mt-1 break-all">{value}</div>
       </div>
     </div>
@@ -514,3 +633,4 @@ function Section({
     </section>
   );
 }
+

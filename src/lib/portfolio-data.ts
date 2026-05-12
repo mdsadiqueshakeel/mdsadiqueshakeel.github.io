@@ -17,7 +17,6 @@ export const profile = {
   name: "Md Sadique Shakeel",
   role: "Backend & Full-Stack Developer",
   email: "mdsadiqueshakeel@gmail.com",
-  phone: "+91 6202488640",
   location: "Kolkata / Patna, India",
   resumePath: "/Md_Sadique_Shakeel_SDE.pdf",
   summary:
