@@ -21,7 +21,7 @@ type HeatDay = {
 };
 
 type RecentSubmission = {
-  submittedAt: any;
+  submittedAt: string;
   title: string;
   status: string;
   lang: string;
