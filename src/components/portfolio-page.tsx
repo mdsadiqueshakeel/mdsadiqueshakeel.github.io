@@ -6,7 +6,6 @@ import type React from "react";
 import {
   ArrowDown,
   ArrowUpRight,
-  BriefcaseBusiness,
   CheckCircle2,
   Download,
   Github,
@@ -19,6 +18,7 @@ import {
   Sparkles,
   TerminalSquare
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { MotionDiv, ParallaxPanel, Reveal } from "@/components/motion";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
@@ -467,7 +467,7 @@ function ContactRow({
   value,
   href
 }: {
-  icon: React.ElementType;
+  icon: LucideIcon;
   label: string;
   value: string;
   href?: string;
