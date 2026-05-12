@@ -93,7 +93,7 @@ function HeroSection() {
     <section id="top" className="relative min-h-[96vh] overflow-hidden px-4 pb-16 pt-28 sm:px-6 lg:px-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_86%_74%,rgba(251,191,36,0.1),transparent_28%)]" />
       <HeroOrbit />
-      <div className="pointer-events-none absolute right-4 top-28 hidden w-[min(520px,42vw)] rounded-lg border border-border/70 bg-card/35 p-4 shadow-soft-black backdrop-blur-xl lg:block">
+      {/* <div className="pointer-events-none absolute right-4 top-28 hidden w-[min(520px,42vw)] rounded-lg border border-border/70 bg-card/35 p-4 shadow-soft-black backdrop-blur-xl lg:block">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>distributed-runtime.map</span>
           <span className="text-emerald-500">healthy</span>
@@ -109,7 +109,7 @@ function HeroSection() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
       <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 lg:min-h-[calc(96vh-9rem)] lg:grid-cols-[1.02fr_0.98fr]">
         <Reveal className="relative z-10">
           <div className="max-w-3xl space-y-8">

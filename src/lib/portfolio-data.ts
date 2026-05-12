@@ -22,8 +22,8 @@ export const profile = {
   summary:
     "B.Tech ECE student graduating 2027 with hands-on experience shipping production backend systems in Java and Python. Designed and deployed live applications using microservices, REST APIs, JWT security, and AWS cloud infrastructure.",
   metrics: [
-    { label: "Live apps shipped", value: "2" },
-    { label: "DSA problems", value: "300+" },
+    { label: "Live apps shipped", value: "4" },
+    { label: "DSA problems", value: "500+" },
     { label: "CGPA", value: "7.69" },
     { label: "Java NPTEL score", value: "87%" }
   ]
