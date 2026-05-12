@@ -49,9 +49,9 @@ const fallbackStats: LeetCodeStats = {
   contestRating: null,
   heatmap: buildFallbackHeatmap(),
   recent: [
-    { title: "Dynamic Programming Practice", status: "Accepted", lang: "Java", timestamp: "0", submittedAt: "Unknown time" },
-    { title: "Graph Traversal Review", status: "Accepted", lang: "Python", timestamp: "0", submittedAt: "Unknown time" },
-    { title: "Binary Search Pattern", status: "Accepted", lang: "Java", timestamp: "0", submittedAt: "Unknown time" },
+    { title: "Dynamic Programming Practice", status: "Accepted", lang: "Java", submittedAt: "Unknown time" },
+    { title: "Graph Traversal Review", status: "Accepted", lang: "Python", submittedAt: "Unknown time" },
+    { title: "Binary Search Pattern", status: "Accepted", lang: "Java", submittedAt: "Unknown time" },
   ],
   source: "fallback",
 };
