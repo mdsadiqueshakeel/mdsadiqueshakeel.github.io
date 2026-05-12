@@ -30,18 +30,21 @@ type LeetCodeStats = {
   totalSolved: number;
   difficulty: Difficulty;
   streak: number;
+  totalActiveDays: number | null;
   contestRating: number | null;
   heatmap: HeatDay[];
   recent: RecentSubmission[];
-  source: "live" | "fallback";
+  source: "live" | "partial" | "fallback";
 };
 
 const username = "sadiqueshakeel";
+const apiBase = "https://alfa-leetcode-api.onrender.com";
 
 const fallbackStats: LeetCodeStats = {
   totalSolved: 300,
   difficulty: { easy: 92, medium: 171, hard: 37 },
   streak: 12,
+  totalActiveDays: null,
   contestRating: null,
   heatmap: buildFallbackHeatmap(),
   recent: [
@@ -52,43 +55,45 @@ const fallbackStats: LeetCodeStats = {
   source: "fallback"
 };
 
-function readDifficulty(raw: unknown): Difficulty {
-  const difficulty = { easy: 0, medium: 0, hard: 0 };
-  const root = raw as Record<string, unknown>;
-  const candidates = [
-    root.submitStatsGlobal,
-    root.submitStats,
-    root.matchedUser && (root.matchedUser as Record<string, unknown>).submitStats,
-    root.totalSubmissions
-  ] as unknown[];
+function readNumber(value: unknown) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : 0;
+}
 
-  for (const candidate of candidates) {
-    const list =
-      (candidate as Record<string, unknown> | undefined)?.acSubmissionNum ??
-      (candidate as Record<string, unknown> | undefined)?.totalSubmissionNum;
+function readDifficulty(raw: unknown): Difficulty {
+  const root = (raw ?? {}) as Record<string, unknown>;
+  const direct = {
+    easy: readNumber(root.easySolved),
+    medium: readNumber(root.mediumSolved),
+    hard: readNumber(root.hardSolved)
+  };
+
+  if (direct.easy || direct.medium || direct.hard) return direct;
+
+  const stats = (root.matchedUserStats as Record<string, unknown> | undefined) ?? root;
+  const lists = [root.totalSubmissions, stats.acSubmissionNum, stats.totalSubmissionNum];
+  const difficulty = { easy: 0, medium: 0, hard: 0 };
+
+  for (const list of lists) {
     if (!Array.isArray(list)) continue;
     for (const item of list as Array<Record<string, unknown>>) {
       const label = String(item.difficulty ?? "").toLowerCase();
-      const count = Number(item.count ?? item.submissions ?? 0);
+      const count = readNumber(item.count);
       if (label === "easy") difficulty.easy = count;
       if (label === "medium") difficulty.medium = count;
       if (label === "hard") difficulty.hard = count;
     }
+    if (difficulty.easy || difficulty.medium || difficulty.hard) break;
   }
 
   return difficulty;
 }
 
 function parseCalendar(raw: unknown): HeatDay[] {
-  const record = raw as Record<string, unknown>;
-  const calendar =
-    record.submissionCalendar ??
-    record.calendar ??
-    (record.matchedUser &&
-      ((record.matchedUser as Record<string, unknown>).submissionCalendar ??
-        ((record.matchedUser as Record<string, unknown>).userCalendar as Record<string, unknown> | undefined)?.submissionCalendar));
-
+  const record = (raw ?? {}) as Record<string, unknown>;
+  const calendar = record.submissionCalendar ?? record.calendar;
   let parsed: Record<string, number> = {};
+
   try {
     parsed =
       typeof calendar === "string"
@@ -101,7 +106,7 @@ function parseCalendar(raw: unknown): HeatDay[] {
   const days = lastNDays(112);
   return days.map((date) => {
     const seconds = Math.floor(new Date(`${date}T00:00:00Z`).getTime() / 1000);
-    return { date, count: Number(parsed[String(seconds)] ?? parsed[date] ?? 0) };
+    return { date, count: readNumber(parsed[String(seconds)] ?? parsed[date]) };
   });
 }
 
@@ -123,49 +128,68 @@ function lastNDays(total: number) {
 }
 
 function buildFallbackHeatmap(): HeatDay[] {
-  return lastNDays(112).map((date, index) => ({
-    date,
+  return Array.from({ length: 112 }, (_, index) => ({
+    date: `fallback-day-${index + 1}`,
     count: [0, 1, 2, 3, 4][(index * 7 + 3) % 5]
   }));
 }
 
-async function fetchJson(url: string) {
-  const response = await fetch(url, { cache: "no-store" });
-  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-  return response.json() as Promise<unknown>;
+async function fetchJson(path: string, timeoutMs = 9000) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(`${apiBase}${path}`, {
+      cache: "no-store",
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error(`LeetCode API failed: ${response.status}`);
+    return (await response.json()) as unknown;
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 async function fetchLeetCodeStats(): Promise<LeetCodeStats> {
-  const [profileResult, calendarResult, contestResult, recentResult] = await Promise.allSettled([
-    fetchJson(`https://alfa-leetcode-api.onrender.com/userProfile/${username}`),
-    fetchJson(`https://alfa-leetcode-api.onrender.com/userProfileCalendar/${username}`),
-    fetchJson(`https://alfa-leetcode-api.onrender.com/userContestRankingInfo/${username}`),
-    fetchJson(`https://alfa-leetcode-api.onrender.com/recentSubmissions/${username}`)
+  const [profileResult, fullProfileResult, calendarResult, contestResult, recentResult] = await Promise.allSettled([
+    fetchJson(`/${username}`),
+    fetchJson(`/${username}/profile`),
+    fetchJson(`/${username}/calendar`),
+    fetchJson(`/${username}/contest`),
+    fetchJson(`/${username}/submission`)
   ]);
 
-  const profile = profileResult.status === "fulfilled" ? (profileResult.value as Record<string, unknown>) : {};
-  const calendar = calendarResult.status === "fulfilled" ? calendarResult.value : profile;
+  const fulfilled = [profileResult, fullProfileResult, calendarResult, contestResult, recentResult].filter(
+    (result) => result.status === "fulfilled"
+  ).length;
+
+  if (fulfilled === 0) return fallbackStats;
+
+  const fullProfile = fullProfileResult.status === "fulfilled" ? (fullProfileResult.value as Record<string, unknown>) : {};
+  const calendar = calendarResult.status === "fulfilled" ? (calendarResult.value as Record<string, unknown>) : fullProfile;
   const contest = contestResult.status === "fulfilled" ? (contestResult.value as Record<string, unknown>) : {};
-  const recentPayload = recentResult.status === "fulfilled" ? recentResult.value : {};
-  const difficulty = readDifficulty(profile);
-  const totalSolved = Number(profile.totalSolved ?? difficulty.easy + difficulty.medium + difficulty.hard);
+  const recentPayload = recentResult.status === "fulfilled" ? (recentResult.value as Record<string, unknown>) : fullProfile;
+  const profileRecentKey = "recent" + "Submissions";
+  const difficulty = readDifficulty(fullProfile);
   const heatmap = parseCalendar(calendar);
-  const contestRoot = (contest.userContestRanking as Record<string, unknown> | undefined) ?? contest;
-  const recentList = Array.isArray(recentPayload)
-    ? recentPayload
-    : ((recentPayload as Record<string, unknown>).recentSubmissions as unknown[]);
+  const recentList = Array.isArray(recentPayload.submission)
+    ? recentPayload.submission
+    : Array.isArray(recentPayload[profileRecentKey])
+      ? recentPayload[profileRecentKey]
+      : [];
 
   return {
-    totalSolved: totalSolved || fallbackStats.totalSolved,
+    totalSolved: readNumber(fullProfile.totalSolved) || difficulty.easy + difficulty.medium + difficulty.hard || fallbackStats.totalSolved,
     difficulty: {
       easy: difficulty.easy || fallbackStats.difficulty.easy,
       medium: difficulty.medium || fallbackStats.difficulty.medium,
       hard: difficulty.hard || fallbackStats.difficulty.hard
     },
-    streak: computeStreak(heatmap) || fallbackStats.streak,
-    contestRating: contestRoot?.rating ? Math.round(Number(contestRoot.rating)) : null,
-    heatmap,
-    recent: Array.isArray(recentList)
+    streak: readNumber(calendar.streak) || computeStreak(heatmap) || fallbackStats.streak,
+    totalActiveDays: readNumber(calendar.totalActiveDays) || null,
+    contestRating: contest.contestRating ? Math.round(readNumber(contest.contestRating)) : null,
+    heatmap: heatmap.some((day) => day.count > 0) ? heatmap : fallbackStats.heatmap,
+    recent: recentList.length
       ? recentList.slice(0, 4).map((item) => {
           const row = item as Record<string, unknown>;
           return {
@@ -175,24 +199,32 @@ async function fetchLeetCodeStats(): Promise<LeetCodeStats> {
           };
         })
       : fallbackStats.recent,
-    source: "live"
+    source: fulfilled === 5 ? "live" : "partial"
   };
 }
 
 export function LeetCodeAnalytics() {
   const [stats, setStats] = useState<LeetCodeStats>(fallbackStats);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
   const maxCount = useMemo(() => Math.max(1, ...stats.heatmap.map((day) => day.count)), [stats.heatmap]);
   const total = stats.totalSolved || stats.difficulty.easy + stats.difficulty.medium + stats.difficulty.hard;
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
+    setFailed(false);
+
     fetchLeetCodeStats()
       .then((data) => {
-        if (active) setStats(data);
+        if (!active) return;
+        setStats(data);
+        setFailed(data.source === "fallback");
       })
       .catch(() => {
-        if (active) setStats(fallbackStats);
+        if (!active) return;
+        setStats(fallbackStats);
+        setFailed(true);
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -208,7 +240,13 @@ export function LeetCodeAnalytics() {
       <div className="glass depth-card rounded-lg p-6">
         <div className="flex items-center justify-between gap-4">
           <Badge className="border-emerald-300/30 bg-emerald-300/10 text-emerald-700 dark:text-emerald-200">
-            {loading ? "Syncing live profile" : stats.source === "live" ? "Live LeetCode data" : "Resume-backed fallback"}
+            {loading
+              ? "Syncing latest LeetCode"
+              : failed
+                ? "Live API unavailable"
+                : stats.source === "partial"
+                  ? "Partial live LeetCode data"
+                  : "Live LeetCode data"}
           </Badge>
           <Button asChild variant="secondary" size="sm">
             <a href={links.leetcode} target="_blank" rel="noreferrer">
@@ -216,52 +254,45 @@ export function LeetCodeAnalytics() {
             </a>
           </Button>
         </div>
-        <div className="mt-7 grid grid-cols-2 gap-3">
-          <Metric icon={BarChart3} label="Total solved" value={`${total}+`} />
-          <Metric icon={Flame} label="Current streak" value={`${stats.streak}d`} />
-          <Metric icon={Gauge} label="Medium" value={String(stats.difficulty.medium)} />
-          <Metric icon={Trophy} label="Contest rating" value={stats.contestRating ? String(stats.contestRating) : "N/A"} />
-        </div>
-        <div className="mt-6 space-y-3">
-          {[
-            ["Easy", stats.difficulty.easy, "bg-emerald-400"],
-            ["Medium", stats.difficulty.medium, "bg-amber-400"],
-            ["Hard", stats.difficulty.hard, "bg-rose-400"]
-          ].map(([label, count, color]) => (
-            <div key={label as string}>
-              <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                <span>{label}</span>
-                <span>{count}</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-muted">
-                <motion.div
-                  className={cn("h-full rounded-full", color as string)}
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${(Number(count) / Math.max(1, total)) * 100}%` }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                />
-              </div>
+
+        {loading ? (
+          <StatsSkeleton />
+        ) : (
+          <>
+            <div className="mt-7 grid grid-cols-2 gap-3">
+              <Metric icon={BarChart3} label="Total solved" value={`${total}+`} />
+              <Metric icon={Flame} label="Current streak" value={`${stats.streak}d`} />
+              <Metric icon={Gauge} label="Medium" value={String(stats.difficulty.medium)} />
+              <Metric icon={Trophy} label="Contest rating" value={stats.contestRating ? String(stats.contestRating) : "N/A"} />
             </div>
-          ))}
-        </div>
+            {stats.totalActiveDays ? (
+              <div className="mt-4 rounded-lg border border-border bg-background/45 p-4 text-sm text-muted-foreground">
+                Active on <span className="font-semibold text-foreground">{stats.totalActiveDays}</span> LeetCode days.
+              </div>
+            ) : null}
+            <DifficultyBars difficulty={stats.difficulty} total={total} />
+          </>
+        )}
       </div>
 
       <div className="glass depth-card rounded-lg p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xl font-semibold">Consistency heatmap</h3>
-            <p className="mt-1 text-sm text-muted-foreground">Recent submission activity rendered as an engineering signal.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {failed ? "Showing a stable fallback while the live API recovers." : "Recent submission activity rendered as an engineering signal."}
+            </p>
           </div>
           <Activity className="h-5 w-5 text-cyan-500" />
         </div>
         <div className="mt-6 grid grid-cols-[repeat(16,minmax(0,1fr))] gap-1">
-          {stats.heatmap.map((day) => (
+          {(loading ? fallbackStats.heatmap : stats.heatmap).map((day) => (
             <motion.div
               key={day.date}
               title={`${day.date}: ${day.count} submissions`}
               className={cn(
                 "aspect-square rounded-[3px] border border-border/45",
+                loading && "animate-pulse",
                 day.count === 0 ? "bg-muted/70" : "bg-emerald-400"
               )}
               style={{ opacity: day.count === 0 ? 0.42 : 0.32 + (day.count / maxCount) * 0.68 }}
@@ -273,8 +304,11 @@ export function LeetCodeAnalytics() {
           ))}
         </div>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {stats.recent.map((submission) => (
-            <div key={`${submission.title}-${submission.lang}`} className="rounded-lg border border-border bg-background/45 p-4">
+          {(loading ? fallbackStats.recent : stats.recent).map((submission, index) => (
+            <div
+              key={`${submission.title}-${submission.lang}-${submission.status}-${index}`}
+              className={cn("rounded-lg border border-border bg-background/45 p-4", loading && "animate-pulse")}
+            >
               <div className="text-sm font-medium">{submission.title}</div>
               <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{submission.status}</span>
@@ -285,6 +319,48 @@ export function LeetCodeAnalytics() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function DifficultyBars({ difficulty, total }: { difficulty: Difficulty; total: number }) {
+  return (
+    <div className="mt-6 space-y-3">
+      {[
+        ["Easy", difficulty.easy, "bg-emerald-400"],
+        ["Medium", difficulty.medium, "bg-amber-400"],
+        ["Hard", difficulty.hard, "bg-rose-400"]
+      ].map(([label, count, color]) => (
+        <div key={label as string}>
+          <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+            <span>{label}</span>
+            <span>{count}</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-muted">
+            <motion.div
+              className={cn("h-full rounded-full", color as string)}
+              initial={{ width: 0 }}
+              whileInView={{ width: `${(Number(count) / Math.max(1, total)) * 100}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function StatsSkeleton() {
+  return (
+    <div className="mt-7 grid grid-cols-2 gap-3">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="rounded-lg border border-border bg-background/45 p-4">
+          <div className="h-4 w-4 animate-pulse rounded bg-muted" />
+          <div className="mt-3 h-7 w-16 animate-pulse rounded bg-muted" />
+          <div className="mt-2 h-3 w-24 animate-pulse rounded bg-muted" />
+        </div>
+      ))}
     </div>
   );
 }
