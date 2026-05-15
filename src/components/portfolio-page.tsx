@@ -36,7 +36,7 @@ const HeroOrbit = dynamic(() => import("@/components/hero-orbit").then((mod) => 
   loading: () => <div className="absolute inset-0 animate-pulse bg-cyan-400/5" />
 });
 
-const navItems = ["About", "Experience", "Projects", "Systems", "Code", "Contact"];
+const navItems = ["About", "Experience",  "Code", "Projects", "Systems", "Contact"];
 
 export function PortfolioPage() {
   return (
@@ -44,10 +44,10 @@ export function PortfolioPage() {
       <Header />
       <HeroSection />
       <AboutSection />
+      <CodingSection />
       <ExperienceSection />
       <ProjectsSection />
       <SystemsSection />
-      <CodingSection />
       <SkillsSection />
       <AchievementsSection />
       <ContactSection />
