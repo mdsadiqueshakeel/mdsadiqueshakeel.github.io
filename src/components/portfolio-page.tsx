@@ -263,6 +263,14 @@ function ExperienceSection() {
   );
 }
 
+function CodingSection() {
+  return (
+    <Section id="code" eyebrow="Coding consistency" title="Live LeetCode analytics that show discipline over time.">
+      <LeetCodeAnalytics />
+    </Section>
+  );
+}
+
 function ProjectsSection() {
   return (
     <Section id="projects" eyebrow="Featured projects" title="Cinematic case studies for systems that actually shipped.">
@@ -395,13 +403,6 @@ function SystemsSection() {
   );
 }
 
-function CodingSection() {
-  return (
-    <Section id="code" eyebrow="Coding consistency" title="Live LeetCode analytics that show discipline over time.">
-      <LeetCodeAnalytics />
-    </Section>
-  );
-}
 
 function SkillsSection() {
   return (
