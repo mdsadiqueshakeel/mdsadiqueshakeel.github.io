@@ -314,9 +314,15 @@ function ExperienceSection() {
 
 function CodingSection() {
   return (
-    <Section id="code" eyebrow="Coding consistency" title="LeetCode analytics built for recruiter confidence.">
-      <LeetCodeAnalytics />
-    </Section>
+    <section id="code" className="px-3 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <Reveal className="mb-5 max-w-3xl sm:mb-7">
+          <Badge>Coding consistency</Badge>
+          <h2 className="mt-3 text-balance text-2xl font-semibold leading-tight sm:text-4xl">LeetCode performance snapshot.</h2>
+        </Reveal>
+        <LeetCodeAnalytics />
+      </div>
+    </section>
   );
 }
 
