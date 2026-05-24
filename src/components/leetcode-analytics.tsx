@@ -394,13 +394,13 @@ export function LeetCodeAnalytics() {
             />
           ))}
         </div>
-        <div className="mt-5 grid gap-2 sm:mt-6 sm:grid-cols-2 sm:gap-3">
+        <div className="-mx-4 mt-5 flex snap-x gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:px-0 sm:pb-0">
           {(loading ? fallbackStats.recent : stats.recent).map(
             (submission, index) => (
               <div
                 key={`${submission.title}-${submission.lang}-${submission.status}-${index}`}
                 className={cn(
-                  "rounded-lg border border-border bg-background/45 p-3 sm:p-4",
+                  "min-w-[78vw] snap-center rounded-lg border border-border bg-background/45 p-3 sm:min-w-0 sm:p-4",
                   loading && "animate-pulse",
                 )}
               >

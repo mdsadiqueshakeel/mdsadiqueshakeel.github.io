@@ -12,9 +12,12 @@ import {
   Code2,
   Download,
   Github,
+  Home,
+  Layers3,
   Linkedin,
   Mail,
   MapPin,
+  MessageCircle,
   Rocket,
   Send,
   Server,
@@ -40,8 +43,9 @@ const navItems = ["About", "Experience", "Code", "Projects", "Systems", "Contact
 
 export function PortfolioPage() {
   return (
-    <main className="min-h-screen overflow-hidden">
+    <main className="min-h-screen overflow-hidden pb-20 md:pb-0">
       <Header />
+      <MobileDock />
       <HeroSection />
       <AboutSection />
       <CodingSection />
@@ -54,6 +58,13 @@ export function PortfolioPage() {
     </main>
   );
 }
+
+const mobileDockItems = [
+  { label: "Home", href: "#top", icon: Home },
+  { label: "Code", href: "#code", icon: Code2 },
+  { label: "Work", href: "#projects", icon: Layers3 },
+  { label: "Talk", href: "#contact", icon: MessageCircle }
+];
 
 function Header() {
   return (
@@ -85,6 +96,28 @@ function Header() {
         </div>
       </nav>
     </header>
+  );
+}
+
+function MobileDock() {
+  return (
+    <nav className="fixed bottom-3 left-1/2 z-50 w-[min(360px,calc(100%-24px))] -translate-x-1/2 md:hidden">
+      <div className="glass grid grid-cols-4 rounded-lg p-1.5 shadow-soft-black">
+        {mobileDockItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="group flex flex-col items-center gap-1 rounded-md px-2 py-2 text-[0.68rem] font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            >
+              <Icon className="h-4 w-4 transition group-hover:-translate-y-0.5" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
 
@@ -132,6 +165,22 @@ function HeroSection() {
                   <div className="mt-1 text-xs text-muted-foreground">{metric.label}</div>
                 </div>
               ))}
+            </div>
+            <div className="glass grid grid-cols-[auto_1fr] gap-3 rounded-lg p-3 sm:hidden">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-cyan-400/15 text-cyan-600 dark:text-cyan-200">
+                <Server className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold">Production backend cockpit</span>
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.8)]" />
+                </div>
+                <div className="mt-2 grid grid-cols-3 gap-1.5 text-[0.68rem] text-muted-foreground">
+                  <span className="rounded-sm bg-background/50 px-2 py-1">JWT</span>
+                  <span className="rounded-sm bg-background/50 px-2 py-1">Redis</span>
+                  <span className="rounded-sm bg-background/50 px-2 py-1">AWS</span>
+                </div>
+              </div>
             </div>
             <div className="flex flex-wrap gap-2 sm:gap-3">
               <Button asChild variant="glow">
@@ -274,9 +323,9 @@ function CodingSection() {
 function ProjectsSection() {
   return (
     <Section id="projects" eyebrow="Featured projects" title="Cinematic case studies for systems that actually shipped.">
-      <div className="space-y-10">
+      <div className="-mx-3 flex snap-x gap-4 overflow-x-auto px-3 pb-3 [scrollbar-width:none] md:mx-0 md:block md:space-y-10 md:overflow-visible md:px-0 md:pb-0">
         {projects.map((project, index) => (
-          <Reveal key={project.name} delay={index * 0.08}>
+          <Reveal key={project.name} delay={index * 0.08} className="min-w-[86vw] snap-center md:min-w-0">
             <article className="glass depth-card overflow-hidden rounded-lg">
               <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className={cn("relative min-h-[280px] bg-gradient-to-br p-4 text-white sm:min-h-[320px] sm:p-6", project.accent)}>
@@ -357,6 +406,7 @@ function ProjectsSection() {
           </Reveal>
         ))}
       </div>
+      <p className="mt-3 text-center text-xs text-muted-foreground md:hidden">Swipe through case studies</p>
     </Section>
   );
 }
