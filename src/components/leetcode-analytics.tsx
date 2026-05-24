@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Activity, BarChart3, Flame, Gauge, Trophy } from "lucide-react";
+import { Activity, Flame, GitCommitVertical, Radar, Trophy } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -29,10 +29,12 @@ type RecentSubmission = {
 
 type LeetCodeStats = {
   totalSolved: number;
+  ranking: number | null;
   difficulty: Difficulty;
   streak: number;
   totalActiveDays: number | null;
   contestRating: number | null;
+  contestAttend: number | null;
   heatmap: HeatDay[];
   recent: RecentSubmission[];
   source: "live" | "partial" | "fallback";
@@ -43,10 +45,12 @@ const apiBase = "https://alfa-leetcode-api.onrender.com";
 
 const fallbackStats: LeetCodeStats = {
   totalSolved: 300,
+  ranking: null,
   difficulty: { easy: 92, medium: 171, hard: 37 },
   streak: 12,
   totalActiveDays: null,
   contestRating: null,
+  contestAttend: null,
   heatmap: buildFallbackHeatmap(),
   recent: [
     { title: "Dynamic Programming Practice", status: "Accepted", lang: "Java", submittedAt: "Unknown time" },
@@ -212,6 +216,7 @@ async function fetchLeetCodeStats(): Promise<LeetCodeStats> {
       readNumber(fullProfile.totalSolved) ||
       difficulty.easy + difficulty.medium + difficulty.hard ||
       fallbackStats.totalSolved,
+    ranking: readNumber(fullProfile.ranking) || null,
     difficulty: {
       easy: difficulty.easy || fallbackStats.difficulty.easy,
       medium: difficulty.medium || fallbackStats.difficulty.medium,
@@ -225,6 +230,7 @@ async function fetchLeetCodeStats(): Promise<LeetCodeStats> {
     contestRating: contest.contestRating
       ? Math.round(readNumber(contest.contestRating))
       : null,
+    contestAttend: readNumber(contest.contestAttend) || null,
     heatmap: heatmap.some((day) => day.count > 0)
       ? heatmap
       : fallbackStats.heatmap,
@@ -261,6 +267,12 @@ export function LeetCodeAnalytics() {
   const total =
     stats.totalSolved ||
     stats.difficulty.easy + stats.difficulty.medium + stats.difficulty.hard;
+  const acceptedTotal = stats.difficulty.easy + stats.difficulty.medium + stats.difficulty.hard;
+  const difficultyMix = [
+    { label: "Easy", value: stats.difficulty.easy, color: "bg-emerald-400", text: "text-emerald-500" },
+    { label: "Medium", value: stats.difficulty.medium, color: "bg-amber-400", text: "text-amber-500" },
+    { label: "Hard", value: stats.difficulty.hard, color: "bg-rose-400", text: "text-rose-500" }
+  ];
 
   useEffect(() => {
     let active = true;
@@ -288,9 +300,9 @@ export function LeetCodeAnalytics() {
   }, []);
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[0.82fr_1.18fr]">
-      <div className="glass depth-card rounded-lg p-6">
-        <div className="flex items-center justify-between gap-4">
+    <div className="grid gap-4 sm:gap-5 lg:grid-cols-[0.82fr_1.18fr]">
+      <div className="glass depth-card rounded-lg p-4 sm:p-6">
+        <div className="flex items-center justify-between gap-3">
           <Badge className="border-emerald-300/30 bg-emerald-300/10 text-emerald-700 dark:text-emerald-200">
             {loading
               ? "Syncing latest LeetCode"
@@ -311,45 +323,41 @@ export function LeetCodeAnalytics() {
           <StatsSkeleton />
         ) : (
           <>
-            <div className="mt-7 grid grid-cols-2 gap-3">
-              <Metric
-                icon={BarChart3}
-                label="Total solved"
-                value={`${total}+`}
-              />
-              <Metric
-                icon={Flame}
-                label="Current streak"
-                value={`${stats.streak}d`}
-              />
-              <Metric
-                icon={Gauge}
-                label="Medium"
-                value={String(stats.difficulty.medium)}
-              />
-              <Metric
-                icon={Trophy}
-                label="Contest rating"
-                value={
-                  stats.contestRating ? String(stats.contestRating) : "N/A"
-                }
-              />
-            </div>
-            {stats.totalActiveDays ? (
-              <div className="mt-4 rounded-lg border border-border bg-background/45 p-4 text-sm text-muted-foreground">
-                Active on{" "}
-                <span className="font-semibold text-foreground">
-                  {stats.totalActiveDays}
-                </span>{" "}
-                LeetCode days.
+            <div className="mt-5 grid gap-4 sm:mt-7 sm:grid-cols-[0.78fr_1.22fr]">
+              <div className="relative overflow-hidden rounded-lg border border-border bg-background/45 p-4">
+                <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-cyan-400/10 blur-2xl" />
+                <div className="relative flex items-center gap-4">
+                  <SolvedRing total={total} accepted={acceptedTotal} />
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Solved</div>
+                    <div className="mt-1 text-3xl font-semibold">{total}+</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {stats.ranking ? `Rank #${stats.ranking.toLocaleString()}` : "Active DSA profile"}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {difficultyMix.map((item) => (
+                    <div key={item.label} className="rounded-md border border-border bg-card/45 p-2 text-center">
+                      <div className={cn("text-sm font-semibold", item.text)}>{item.value}</div>
+                      <div className="mt-0.5 text-[0.65rem] text-muted-foreground">{item.label}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : null}
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                <Metric icon={Flame} label="Current streak" value={`${stats.streak}d`} />
+                <Metric icon={Activity} label="Active days" value={stats.totalActiveDays ? String(stats.totalActiveDays) : "N/A"} />
+                <Metric icon={Trophy} label="Contest rating" value={stats.contestRating ? String(stats.contestRating) : "N/A"} />
+                <Metric icon={Radar} label="Contests" value={stats.contestAttend ? String(stats.contestAttend) : "N/A"} />
+              </div>
+            </div>
             <DifficultyBars difficulty={stats.difficulty} total={total} />
           </>
         )}
       </div>
 
-      <div className="glass depth-card rounded-lg p-6">
+      <div className="glass depth-card rounded-lg p-4 sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-xl font-semibold">Consistency heatmap</h3>
@@ -361,7 +369,7 @@ export function LeetCodeAnalytics() {
           </div>
           <Activity className="h-5 w-5 text-cyan-500" />
         </div>
-        <div className="mt-6 grid grid-cols-[repeat(16,minmax(0,1fr))] gap-1">
+        <div className="mt-5 grid grid-cols-[repeat(14,minmax(0,1fr))] gap-1 sm:mt-6 sm:grid-cols-[repeat(16,minmax(0,1fr))]">
           {(loading ? fallbackStats.heatmap : stats.heatmap).map((day) => (
             <motion.div
               key={day.date}
@@ -386,35 +394,57 @@ export function LeetCodeAnalytics() {
             />
           ))}
         </div>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="mt-5 grid gap-2 sm:mt-6 sm:grid-cols-2 sm:gap-3">
           {(loading ? fallbackStats.recent : stats.recent).map(
             (submission, index) => (
               <div
                 key={`${submission.title}-${submission.lang}-${submission.status}-${index}`}
                 className={cn(
-                  "rounded-lg border border-border bg-background/45 p-4",
+                  "rounded-lg border border-border bg-background/45 p-3 sm:p-4",
                   loading && "animate-pulse",
                 )}
               >
-                <div className="text-sm font-medium">{submission.title}</div>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span>{submission.status}</span>
+                <div className="flex items-start gap-2">
+                  <GitCommitVertical className="mt-0.5 h-4 w-4 shrink-0 text-cyan-500" />
+                  <div className="min-w-0">
+                    <div className="line-clamp-2 text-sm font-medium">{submission.title}</div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <span className={cn("rounded-sm px-1.5 py-0.5", submission.status === "Accepted" ? "bg-emerald-400/12 text-emerald-500" : "bg-amber-400/12 text-amber-500")}>
+                        {submission.status}
+                      </span>
 
-                  <span className="h-1 w-1 rounded-full bg-muted-foreground" />
+                      <span>{submission.lang}</span>
 
-                  <span>{submission.lang}</span>
-
-                  {submission.submittedAt ? (
-                    <>
-                      <span className="h-1 w-1 rounded-full bg-muted-foreground" />
-                      <span>{submission.submittedAt}</span>
-                    </>
-                  ) : null}
+                      {submission.submittedAt ? (
+                        <>
+                          <span className="h-1 w-1 rounded-full bg-muted-foreground" />
+                          <span>{submission.submittedAt}</span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
               </div>
             ),
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function SolvedRing({ total, accepted }: { total: number; accepted: number }) {
+  const percent = Math.min(100, Math.round((accepted / Math.max(total, 1)) * 100));
+
+  return (
+    <div
+      className="grid h-20 w-20 shrink-0 place-items-center rounded-full"
+      style={{
+        background: `conic-gradient(rgb(34 211 238) ${percent * 3.6}deg, hsl(var(--muted)) 0deg)`
+      }}
+    >
+      <div className="grid h-[4.35rem] w-[4.35rem] place-items-center rounded-full bg-card text-sm font-semibold">
+        {percent}%
       </div>
     </div>
   );
@@ -428,7 +458,7 @@ function DifficultyBars({
   total: number;
 }) {
   return (
-    <div className="mt-6 space-y-3">
+    <div className="mt-5 space-y-3 sm:mt-6">
       {[
         ["Easy", difficulty.easy, "bg-emerald-400"],
         ["Medium", difficulty.medium, "bg-amber-400"],
@@ -458,11 +488,11 @@ function DifficultyBars({
 
 function StatsSkeleton() {
   return (
-    <div className="mt-7 grid grid-cols-2 gap-3">
+    <div className="mt-5 grid grid-cols-2 gap-2 sm:mt-7 sm:gap-3">
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
-          className="rounded-lg border border-border bg-background/45 p-4"
+          className="rounded-lg border border-border bg-background/45 p-3 sm:p-4"
         >
           <div className="h-4 w-4 animate-pulse rounded bg-muted" />
           <div className="mt-3 h-7 w-16 animate-pulse rounded bg-muted" />
@@ -484,12 +514,12 @@ function Metric({
 }) {
   return (
     <motion.div
-      className="rounded-lg border border-border bg-background/45 p-4"
+      className="rounded-lg border border-border bg-background/45 p-3 sm:p-4"
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
     >
       <Icon className="h-4 w-4 text-cyan-500" />
-      <div className="mt-3 text-2xl font-semibold">{value}</div>
+      <div className="mt-2 text-xl font-semibold sm:mt-3 sm:text-2xl">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
     </motion.div>
   );

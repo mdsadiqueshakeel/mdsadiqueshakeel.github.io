@@ -36,7 +36,7 @@ const HeroOrbit = dynamic(() => import("@/components/hero-orbit").then((mod) => 
   loading: () => <div className="absolute inset-0 animate-pulse bg-cyan-400/5" />
 });
 
-const navItems = ["About", "Experience",  "Code", "Projects", "Systems", "Contact"];
+const navItems = ["About", "Experience", "Code", "Projects", "Systems", "Contact"];
 
 export function PortfolioPage() {
   return (
@@ -57,10 +57,10 @@ export function PortfolioPage() {
 
 function Header() {
   return (
-    <header className="fixed left-0 right-0 top-4 z-40 mx-auto w-[min(1120px,calc(100%-24px))]">
-      <nav className="glass flex h-14 items-center justify-between rounded-lg px-3 shadow-soft-black">
+    <header className="fixed left-0 right-0 top-3 z-40 mx-auto w-[min(1120px,calc(100%-16px))] sm:top-4 sm:w-[min(1120px,calc(100%-24px))]">
+      <nav className="glass flex h-12 items-center justify-between rounded-lg px-2 shadow-soft-black sm:h-14 sm:px-3">
         <Link href="#top" className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-semibold">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground text-background">MS</span>
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-foreground text-xs text-background sm:h-8 sm:w-8 sm:text-sm">MS</span>
           <span className="hidden sm:block">Md Sadique Shakeel</span>
         </Link>
         <div className="hidden items-center gap-1 lg:flex">
@@ -90,7 +90,7 @@ function Header() {
 
 function HeroSection() {
   return (
-    <section id="top" className="relative min-h-[96vh] overflow-hidden px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+    <section id="top" className="relative min-h-[92vh] overflow-hidden px-3 pb-10 pt-24 sm:px-6 sm:pb-16 sm:pt-28 lg:min-h-[96vh] lg:px-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_42%,rgba(34,211,238,0.18),transparent_34%),radial-gradient(circle_at_86%_74%,rgba(251,191,36,0.1),transparent_28%)]" />
       <HeroOrbit />
       {/* <div className="pointer-events-none absolute right-4 top-28 hidden w-[min(520px,42vw)] rounded-lg border border-border/70 bg-card/35 p-4 shadow-soft-black backdrop-blur-xl lg:block">
@@ -110,30 +110,30 @@ function HeroSection() {
           ))}
         </div>
       </div> */}
-      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 lg:min-h-[calc(96vh-9rem)] lg:grid-cols-[1.02fr_0.98fr]">
+      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-6 sm:gap-10 lg:min-h-[calc(96vh-9rem)] lg:grid-cols-[1.02fr_0.98fr]">
         <Reveal className="relative z-10">
-          <div className="max-w-3xl space-y-8">
+          <div className="max-w-3xl space-y-5 sm:space-y-8">
             <Badge className="border-cyan-300/35 bg-cyan-300/10 text-cyan-700 dark:text-cyan-200">
               <Sparkles className="mr-2 h-3.5 w-3.5" />
               Backend systems, AI microservices, cloud delivery
             </Badge>
-            <div className="space-y-5">
-              <h1 className="text-balance text-5xl font-semibold leading-[1.02] tracking-normal sm:text-6xl lg:text-7xl">
+            <div className="space-y-3 sm:space-y-5">
+              <h1 className="text-balance text-4xl font-semibold leading-[1.03] tracking-normal min-[380px]:text-[2.65rem] sm:text-6xl lg:text-7xl">
                 {profile.name}
               </h1>
-              <p className="max-w-2xl text-balance text-xl leading-8 text-muted-foreground sm:text-2xl">
+              <p className="max-w-2xl text-balance text-base leading-7 text-muted-foreground sm:text-2xl sm:leading-8">
                 Production-minded developer building scalable Java/Python systems, live SaaS products, and AI-enabled engineering workflows.
               </p>
             </div>
-            <div className="grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid max-w-2xl grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
               {profile.metrics.map((metric) => (
-                <div key={metric.label} className="glass rounded-lg p-4">
-                  <div className="text-2xl font-semibold">{metric.value}</div>
+                <div key={metric.label} className="glass rounded-lg p-3 sm:p-4">
+                  <div className="text-xl font-semibold sm:text-2xl">{metric.value}</div>
                   <div className="mt-1 text-xs text-muted-foreground">{metric.label}</div>
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               <Button asChild variant="glow">
                 <Link href="#projects">
                   <Rocket className="h-4 w-4" />
@@ -155,16 +155,16 @@ function HeroSection() {
             </div>
           </div>
         </Reveal>
-        <ParallaxPanel className="relative z-10 min-h-[380px] lg:min-h-[520px]">
-          <div className="absolute bottom-4 left-0 right-0 grid gap-3 sm:grid-cols-3 lg:bottom-12 lg:left-10 lg:right-10">
+        <ParallaxPanel className="relative z-10 min-h-[235px] sm:min-h-[340px] lg:min-h-[520px]">
+          <div className="absolute bottom-2 left-0 right-0 grid grid-cols-3 gap-2 sm:bottom-4 sm:gap-3 lg:bottom-12 lg:left-10 lg:right-10">
             {[
               ["Auth", "JWT/RBAC"],
               ["Latency", "Redis cache"],
               ["Delivery", "AWS EC2"]
             ].map(([label, value]) => (
-              <div key={value} className="glass rounded-lg p-4 shadow-soft-black">
-                <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
-                <div className="mt-2 text-sm font-semibold">{value}</div>
+              <div key={value} className="glass rounded-lg p-2.5 shadow-soft-black sm:p-4">
+                <div className="text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground sm:text-xs sm:tracking-[0.2em]">{label}</div>
+                <div className="mt-1 text-xs font-semibold sm:mt-2 sm:text-sm">{value}</div>
                 <div className="flow-line mt-3 h-px rounded-full" />
               </div>
             ))}
@@ -186,15 +186,15 @@ function AboutSection() {
   return (
     <Section id="about" eyebrow="Current signal" title="A backend-first engineer with product shipping instincts.">
       <div className="grid gap-5 lg:grid-cols-[1fr_0.8fr]">
-        <Reveal className="glass rounded-lg p-6 sm:p-8">
-          <p className="text-lg leading-8 text-muted-foreground">{profile.summary}</p>
-          <div className="mt-7 grid gap-3 sm:grid-cols-3">
+        <Reveal className="glass rounded-lg p-4 sm:p-8">
+          <p className="text-sm leading-7 text-muted-foreground sm:text-lg sm:leading-8">{profile.summary}</p>
+          <div className="mt-5 grid gap-3 sm:mt-7 sm:grid-cols-3">
             {[
               ["Focus", "Backend engineering, distributed systems, cloud/DevOps"],
               ["Strength", "Microservices, auth, caching, APIs, deployment"],
               ["Edge", "AI/ML integration with production Java backends"]
             ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-border bg-background/40 p-4">
+              <div key={label} className="rounded-lg border border-border bg-background/40 p-3 sm:p-4">
                 <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
                 <div className="mt-2 text-sm leading-6">{value}</div>
               </div>
@@ -205,7 +205,7 @@ function AboutSection() {
           {education.map((item) => {
             const Icon = item.icon;
             return (
-              <div key={item.title} className="glass rounded-lg p-5">
+              <div key={item.title} className="glass rounded-lg p-4 sm:p-5">
                 <Icon className="h-5 w-5 text-cyan-500" />
                 <h3 className="mt-3 font-semibold">{item.title}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{item.org}</p>
@@ -228,13 +228,13 @@ function ExperienceSection() {
           const Icon = experience.icon;
           return (
             <Reveal key={experience.role} delay={index * 0.08}>
-              <article className="glass relative rounded-lg p-6 md:ml-14">
+              <article className="glass relative rounded-lg p-4 sm:p-6 md:ml-14">
                 <div className="absolute -left-[4.25rem] top-6 hidden h-10 w-10 items-center justify-center rounded-md border border-border bg-card md:flex">
                   <Icon className="h-5 w-5 text-cyan-500" />
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h3 className="text-xl font-semibold">{experience.role}</h3>
+                    <h3 className="text-lg font-semibold sm:text-xl">{experience.role}</h3>
                     <p className="text-muted-foreground">{experience.company}</p>
                   </div>
                   <Badge>{experience.period}</Badge>
@@ -265,7 +265,7 @@ function ExperienceSection() {
 
 function CodingSection() {
   return (
-    <Section id="code" eyebrow="Coding consistency" title="Live LeetCode analytics that show discipline over time.">
+    <Section id="code" eyebrow="Coding consistency" title="LeetCode analytics built for recruiter confidence.">
       <LeetCodeAnalytics />
     </Section>
   );
@@ -279,13 +279,13 @@ function ProjectsSection() {
           <Reveal key={project.name} delay={index * 0.08}>
             <article className="glass depth-card overflow-hidden rounded-lg">
               <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
-                <div className={cn("relative min-h-[320px] bg-gradient-to-br p-6 text-white", project.accent)}>
+                <div className={cn("relative min-h-[280px] bg-gradient-to-br p-4 text-white sm:min-h-[320px] sm:p-6", project.accent)}>
                   <div className="absolute inset-0 bg-slate-950/30" />
                   <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.13)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.13)_1px,transparent_1px)] bg-[size:38px_38px] opacity-30" />
                   <div className="relative flex h-full flex-col justify-between">
                     <div>
                       <Badge className="border-white/20 bg-white/15 text-white">{project.label}</Badge>
-                      <h3 className="mt-5 text-3xl font-semibold">{project.name}</h3>
+                      <h3 className="mt-4 text-2xl font-semibold sm:mt-5 sm:text-3xl">{project.name}</h3>
                     </div>
                     <div className="grid gap-3">
                       {project.architecture.map((node, nodeIndex) => (
@@ -306,7 +306,7 @@ function ProjectsSection() {
                     </div>
                   </div>
                 </div>
-                <div className="p-6 sm:p-8">
+                <div className="p-4 sm:p-8">
                   <div className="mb-6 grid gap-3 sm:grid-cols-3">
                     {["Design", "Deploy", "Monitor"].map((phase) => (
                       <div key={phase} className="rounded-lg border border-border bg-background/45 p-3">
@@ -315,7 +315,7 @@ function ProjectsSection() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-lg leading-8 text-muted-foreground">{project.description}</p>
+                  <p className="text-sm leading-7 text-muted-foreground sm:text-lg sm:leading-8">{project.description}</p>
                   <div className="mt-6 flex flex-wrap gap-2">
                     {project.stack.map((tech) => (
                       <Badge key={tech}>{tech}</Badge>
@@ -323,7 +323,7 @@ function ProjectsSection() {
                   </div>
                   <div className="mt-7 grid gap-3 sm:grid-cols-2">
                     {project.stats.map((stat) => (
-                      <div key={stat} className="rounded-lg border border-border bg-background/45 p-4 text-sm">
+                      <div key={stat} className="rounded-lg border border-border bg-background/45 p-3 text-sm sm:p-4">
                         {stat}
                       </div>
                     ))}
@@ -366,8 +366,8 @@ function SystemsSection() {
   return (
     <Section id="systems" eyebrow="Engineering view" title="Architecture patterns that show how the work holds together.">
       <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-        <Reveal className="glass rounded-lg p-6">
-          <h3 className="text-xl font-semibold">System design strengths</h3>
+        <Reveal className="glass rounded-lg p-4 sm:p-6">
+          <h3 className="text-lg font-semibold sm:text-xl">System design strengths</h3>
           <div className="mt-5 grid gap-3">
             {[
               "Service decomposition with API Gateway routing for unified access.",
@@ -382,12 +382,12 @@ function SystemsSection() {
             ))}
           </div>
         </Reveal>
-        <Reveal delay={0.08} className="glass rounded-lg p-6">
+        <Reveal delay={0.08} className="glass rounded-lg p-4 sm:p-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {nodes.map((node, index) => (
               <MotionDiv
                 key={node}
-                className="relative rounded-lg border border-border bg-background/40 p-4"
+                className="relative rounded-lg border border-border bg-background/40 p-3 sm:p-4"
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 240, damping: 18 }}
               >
@@ -412,7 +412,7 @@ function SkillsSection() {
           const Icon = skill.icon;
           return (
             <Reveal key={skill.title} delay={index * 0.04}>
-              <div className="glass h-full rounded-lg p-5 transition hover:-translate-y-1 hover:shadow-glow">
+              <div className="glass h-full rounded-lg p-4 transition hover:-translate-y-1 hover:shadow-glow sm:p-5">
                 <Icon className="h-6 w-6 text-cyan-500" />
                 <h3 className="mt-4 text-lg font-semibold">{skill.title}</h3>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -441,7 +441,7 @@ function AchievementsSection() {
                 href={achievement.href}
                 target="_blank"
                 rel="noreferrer"
-                className="glass group block h-full rounded-lg p-5 transition hover:-translate-y-1 hover:shadow-glow"
+                className="glass group block h-full rounded-lg p-4 transition hover:-translate-y-1 hover:shadow-glow sm:p-5"
               >
                 <div className="flex items-start justify-between gap-4">
                   <Icon className="h-6 w-6 text-cyan-500" />
@@ -476,13 +476,13 @@ function ContactSection() {
   };
 
   return (
-    <section id="contact" className="px-4 py-24 sm:px-6 lg:px-8">
+    <section id="contact" className="px-3 py-16 sm:px-6 sm:py-24 lg:px-8">
       <Reveal>
         <div className="glass depth-card mx-auto max-w-6xl overflow-hidden rounded-lg shadow-soft-black">
           <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="p-7 sm:p-10">
+            <div className="p-4 sm:p-10">
               <Badge className="border-cyan-300/30 bg-cyan-300/10 text-cyan-700 dark:text-cyan-200">Open to strong engineering roles</Badge>
-              <h2 className="mt-5 text-3xl font-semibold sm:text-5xl">Let&apos;s build systems that survive real traffic.</h2>
+              <h2 className="mt-4 text-2xl font-semibold sm:mt-5 sm:text-5xl">Let&apos;s build systems that survive real traffic.</h2>
               <p className="mt-5 max-w-2xl text-muted-foreground">
                 Available for backend, full-stack, DevOps, and AI integration opportunities where shipping production-quality software matters.
               </p>
@@ -512,7 +512,7 @@ function ContactSection() {
                 </Button>
               </div>
             </div>
-            <div className="border-t border-border p-7 sm:p-10 lg:border-l lg:border-t-0">
+            <div className="border-t border-border p-4 sm:p-10 lg:border-l lg:border-t-0">
               <form onSubmit={submitContact} className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="grid gap-2 text-sm">
@@ -623,15 +623,14 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="px-4 py-20 sm:px-6 lg:px-8">
+    <section id={id} className="px-3 py-14 sm:px-6 sm:py-20 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <Reveal className="mb-10 max-w-3xl">
+        <Reveal className="mb-7 max-w-3xl sm:mb-10">
           <Badge>{eyebrow}</Badge>
-          <h2 className="mt-4 text-balance text-3xl font-semibold leading-tight sm:text-5xl">{title}</h2>
+          <h2 className="mt-3 text-balance text-2xl font-semibold leading-tight sm:mt-4 sm:text-5xl">{title}</h2>
         </Reveal>
         {children}
       </div>
     </section>
   );
 }
-
