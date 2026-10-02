@@ -509,16 +509,6 @@ h1,h2,h3{ font-weight:400; margin:0; letter-spacing:-.005em; }
   border-color:rgba(224,35,28,.84); box-shadow:0 0 0 5px rgba(224,35,28,.09), inset 0 0 22px rgba(224,35,28,.08); }
 .cur-dot.act::before{ opacity:.45; transform:scale(.65); }
 .cur-dot.act span{ opacity:1; transform:scale(1); }
-.cur-dot .lens-window{ position:absolute; inset:0; overflow:hidden; border-radius:50%; opacity:0; pointer-events:none; }
-.cur-dot .lens-content{ position:absolute; inset:0; overflow:visible; }
-.cur-dot.magnify{ width:132px; height:132px; margin:-66px 0 0 -66px; overflow:hidden;
-  border:1px solid rgba(224,35,28,.9); background:rgba(5,7,10,.94);
-  box-shadow:0 0 0 5px rgba(224,35,28,.12),0 8px 34px rgba(0,0,0,.4),inset 0 0 22px rgba(224,35,28,.08);
-  transition:width .2s var(--ease-out),height .2s var(--ease-out),margin .2s var(--ease-out),background .2s,border-color .2s,box-shadow .2s,opacity .3s; }
-.cur-dot.magnify::before,.cur-dot.magnify span{ opacity:0; }
-.cur-dot.magnify .lens-window{ opacity:1; }
-.cur-dot .lens-clone{ position:absolute!important; max-width:none!important; pointer-events:none!important; transform-origin:0 0!important; }
-@media (prefers-reduced-motion:reduce){ .cur-dot.magnify{ transition:none; } }
 @media (hover:hover) and (pointer:fine){
   *, *::before, *::after{ cursor:none !important; }
   .cur-dot{ opacity:1 }
@@ -957,7 +947,7 @@ body[data-layout-footer="b"] .foot-base span:last-child{ text-align:right; }
 <canvas id="gl" aria-hidden="true"></canvas>
 <div id="vignette"></div>
 <div id="grain"></div>
-<div class="cur-dot" id="cursor" aria-hidden="true"><span></span><div class="lens-window"><div class="lens-content"></div></div></div>
+<div class="cur-dot" id="cursor" aria-hidden="true"><span></span></div>
 
 <!-- ============================================================ preloader -->
 <div id="pre" role="status" aria-live="polite">
@@ -4531,39 +4521,11 @@ function wireFocus() {
 function wireCursor() {
   const dot = $('#cursor');
   if (COARSE) { dot.style.display = 'none'; return; }
-  const lens = dot.querySelector('.lens-content');
-  const lensFactor = 1.8;
-  let lensSource = null;
   let x = vpW() / 2, y = vpH() / 2, tx2 = x, ty = y;
   addEventListener('pointermove', e => {
     tx2 = e.clientX; ty = e.clientY;
     RIG.tmx = (e.clientX / vpW()) * 2 - 1;
     RIG.tmy = -((e.clientY / vpH()) * 2 - 1);
-    const hit = document.elementFromPoint(e.clientX, e.clientY);
-    const textArea = hit && hit.closest('p,h1,h2,h3,h4,li,summary,.eyebrow,.chip,.les,.k,.nav-link,.brand,.card-lab,.card-meta,.project-stack,.project-action,.cta');
-    if (textArea && textArea !== dot && textArea !== lensSource) {
-      const rect = textArea.getBoundingClientRect();
-      const copy = textArea.cloneNode(true);
-      copy.classList.add('lens-clone');
-      copy.removeAttribute('id');
-      copy.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
-      copy.querySelectorAll('a,button,summary').forEach(node => { node.removeAttribute('data-cursor'); });
-      copy.style.cssText += ';position:absolute;left:0;top:0;width:' + rect.width + 'px;margin:0;';
-      lens.replaceChildren(copy);
-      lensSource = textArea;
-      dot.classList.add('magnify');
-    } else if (!textArea) {
-      dot.classList.remove('magnify');
-      lens.replaceChildren();
-      lensSource = null;
-    }
-    if (textArea && dot.classList.contains('magnify')) {
-      const rect = textArea.getBoundingClientRect();
-      const localX = e.clientX - rect.left;
-      const localY = e.clientY - rect.top;
-      const copy = lens.firstElementChild;
-      if (copy) copy.style.transform = 'translate3d(' + (66 - localX * lensFactor).toFixed(1) + 'px,' + (66 - localY * lensFactor).toFixed(1) + 'px,0) scale(' + lensFactor + ')';
-    }
   }, { passive: true });
   $$('[data-cursor]').forEach(el => {
     el.addEventListener('mouseenter', () => {
