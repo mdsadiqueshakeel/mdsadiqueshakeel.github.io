@@ -1,20 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { CustomCursor } from "@/components/custom-cursor";
-import { ScrollProgress } from "@/components/motion";
-import { ThemeProvider } from "@/components/theme-provider";
 import { profile } from "@/lib/portfolio-data";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"]
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"]
-});
 
 export const metadata: Metadata = {
   title: `${profile.name} | Backend & Full-Stack Developer`,
@@ -52,14 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <ScrollProgress />
-          <CustomCursor />
-          <div className="noise" />
-          {children}
-        </ThemeProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

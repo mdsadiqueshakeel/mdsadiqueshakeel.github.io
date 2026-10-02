@@ -19,7 +19,7 @@ function DataPulse({ radius = 1.7, speed = 0.8, offset = 0 }: { radius?: number;
   return (
     <mesh ref={pulse}>
       <sphereGeometry args={[0.045, 16, 16]} />
-      <meshStandardMaterial color="#67e8f9" emissive="#0891b2" emissiveIntensity={1.4} roughness={0.18} />
+    <meshStandardMaterial color="#ff6a4a" emissive="#a51d17" emissiveIntensity={1.25} roughness={0.18} />
     </mesh>
   );
 }
@@ -51,16 +51,16 @@ function InfrastructureModel() {
   });
 
   return (
-    <group ref={root} rotation={[0.08, -0.35, 0]} position={[1.55, -0.03, 0]} scale={1.22}>
+    <group ref={root} rotation={[0.08, -0.35, 0]} position={[0.95, -0.03, 0]} scale={1.05}>
       <group>
         <mesh ref={core} position={nodes[0]}>
           <octahedronGeometry args={[0.42, 1]} />
-          <meshStandardMaterial color="#67e8f9" emissive="#0891b2" emissiveIntensity={1.4} metalness={0.2} roughness={0.18} />
+          <meshStandardMaterial color="#e84a35" emissive="#a51d17" emissiveIntensity={1.3} metalness={0.2} roughness={0.18} />
         </mesh>
         <mesh position={nodes[0]} scale={1.28}>
           <octahedronGeometry args={[0.42, 1]} />
           <MeshTransmissionMaterial
-            color="#67e8f9"
+            color="#dfe7e0"
             thickness={0.35}
             roughness={0.18}
             transmission={0.55}
@@ -71,10 +71,10 @@ function InfrastructureModel() {
           />
         </mesh>
         <Torus args={[0.72, 0.012, 12, 96]} rotation={[Math.PI / 2.2, 0, 0]}>
-          <meshStandardMaterial color="#22d3ee" emissive="#155e75" emissiveIntensity={0.9} transparent opacity={0.7} />
+          <meshStandardMaterial color="#e84a35" emissive="#7f1916" emissiveIntensity={0.9} transparent opacity={0.7} />
         </Torus>
         <Torus args={[1.28, 0.009, 12, 112]} rotation={[Math.PI / 2.6, 0.2, 0.35]}>
-          <meshStandardMaterial color="#a7f3d0" emissive="#047857" emissiveIntensity={0.45} transparent opacity={0.42} />
+          <meshStandardMaterial color="#c9a24a" emissive="#6e5017" emissiveIntensity={0.45} transparent opacity={0.42} />
         </Torus>
       </group>
 
@@ -82,15 +82,15 @@ function InfrastructureModel() {
         <group key={node.join(",")} position={node}>
           <RoundedBox args={[0.5, 0.32, 0.16]} radius={0.035} smoothness={5}>
             <meshStandardMaterial
-              color={index % 2 === 0 ? "#164e63" : "#14532d"}
-              emissive={index % 2 === 0 ? "#0891b2" : "#16a34a"}
+              color={index % 2 === 0 ? "#3b1916" : "#28251b"}
+              emissive={index % 2 === 0 ? "#8b241c" : "#68501e"}
               emissiveIntensity={0.62}
               metalness={0.45}
               roughness={0.38}
             />
           </RoundedBox>
           <Box args={[0.34, 0.018, 0.172]} position={[0, 0.08, 0.002]}>
-            <meshStandardMaterial color={index % 2 === 0 ? "#67e8f9" : "#86efac"} emissive="#0891b2" emissiveIntensity={0.8} />
+            <meshStandardMaterial color={index % 2 === 0 ? "#ff7351" : "#d0ae61"} emissive="#8b241c" emissiveIntensity={0.8} />
           </Box>
         </group>
       ))}
@@ -99,7 +99,7 @@ function InfrastructureModel() {
         <Line
           key={`line-${node.join(",")}`}
           points={[nodes[0], node]}
-          color={index % 2 === 0 ? "#67e8f9" : "#a7f3d0"}
+          color={index % 2 === 0 ? "#ff7351" : "#c9a24a"}
           transparent
           opacity={0.72}
           lineWidth={1.7}
@@ -115,12 +115,12 @@ function InfrastructureModel() {
 
 export function HeroOrbit() {
   return (
-    <div className="absolute inset-0 pointer-events-none">
+    <div className="portfolio-world absolute inset-0 pointer-events-none">
       <Canvas camera={{ position: [0, 0.2, 5.4], fov: 38 }} dpr={[1, 1.35]} performance={{ min: 0.55 }}>
         <ambientLight intensity={0.72} />
         <directionalLight position={[4, 4, 5]} intensity={1.15} />
-        <pointLight position={[-3, 1.2, 3]} color="#67e8f9" intensity={1.65} />
-        <pointLight position={[3, -1.8, 2]} color="#fbbf24" intensity={0.72} />
+        <pointLight position={[-3, 1.2, 3]} color="#e0231c" intensity={1.45} />
+        <pointLight position={[3, -1.8, 2]} color="#c9a24a" intensity={0.72} />
         <InfrastructureModel />
       </Canvas>
     </div>

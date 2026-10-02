@@ -19,7 +19,7 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 24 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay }}
@@ -32,7 +32,7 @@ export function Reveal({
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-  return <motion.div className="fixed left-0 top-0 z-50 h-1 origin-left bg-cyan-400" style={{ scaleX }} />;
+  return <motion.div className="fixed left-0 top-0 z-50 h-px origin-left bg-[#e0231c]" style={{ scaleX }} />;
 }
 
 export function ParallaxPanel({ children, className }: { children: React.ReactNode; className?: string }) {
